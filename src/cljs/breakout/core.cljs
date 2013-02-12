@@ -40,9 +40,19 @@
 
 (defn draw [world]
   (let [x (:x @world)
-        y (:y @world)]
+        y (:y @world)
+        dx (:dx @world)
+        dy (:dy @world)]
     (clear)
     (circle x y 10)
+
+    (if (or (> (+ x dx) width)
+          (< (+ x dx) 0))
+      (atom-set world :dx (- dx)))
+    (if (or (> (+ y dy) height)
+            (< (+ y dy) 0))
+      (atom-set world :dy (- dy)))
+
     (update-world world)))
 
 (defn init []
