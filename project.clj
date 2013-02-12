@@ -9,7 +9,7 @@
 
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [compojure "1.1.5"]
-                 [enfocus "1.0.0-beta3"]]
+                 [domina "1.0.1"]]
 
   :plugins [[lein-cljsbuild "0.3.0"]
             [lein-ring "0.8.2"]]
