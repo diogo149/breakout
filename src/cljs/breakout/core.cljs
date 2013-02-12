@@ -4,44 +4,49 @@
 (def ctx
   (.getContext (by-id "canvas") "2d"))
 
-; (defn fill-style [el color]
-  ; (set! (.-fillStyle el) color))
-
-; (doto ctx
-  ; (fill-style "rgba(51, 204, 255, .7)")
-  ; (.beginPath)
-  ; (.arc 220 150 70 0 (* Math/PI 2) true)
-  ; (.closePath)
-  ; (.fill)
-
-  ; (fill-style "rgba(255, 51, 102, .5)")
-  ; (.beginPath)
-  ; (.arc 100 100 100 0 (* Math/PI 2) true)
-  ; (.closePath)
-  ; (.fill)
-
-  ; (fill-style "rgba(255, 204, 51, .5)")
-  ; (.beginPath)
-  ; (.rect 15 150 120 120)
-  ; (.closePath)
-  ; (.fill))
-
-(def x 300)
-(def y 300)
-(def dx -2)
-(def dy -1)
-
-(defn draw []
+(defn circle [x y r]
   (doto ctx
-    (.clearRect 0 0 300 300)
     (.beginPath)
-    (.arc x y 10 0 (* Math/PI 2) true)
+    (.arc x y r 0 (* Math/PI 2) true)
     (.closePath)
-    (.fill))
-  (set! x (+ dx x))
-  (set! y (+ dy y)))
+    (.fill)))
+
+(defn rect [x y w h]
+  (doto ctx
+    (.beginPath)
+    (.rect x y w h)
+    (.closePath)
+    (.fill)))
+
+(def width 300)
+(def height 300)
+
+(defn clear []
+  (.clearRect ctx 0 0 width height))
+
+(defn create-world []
+  (atom {:x 150
+   :y 150
+   :dx 2
+   :dy 4}))
+
+(defn atom-set [atom & values]
+  (do (swap! atom #(apply assoc % values))
+      atom))
+
+(defn update-world [world]
+  (atom-set world :x (+ (:x @world) (:dx @world)))
+  (atom-set world :y (+ (:y @world) (:dy @world))))
+
+(defn draw [world]
+  (let [x (:x @world)
+        y (:y @world)]
+    (clear)
+    (circle x y 10)
+    (update-world world)))
 
 (defn init []
-  (js/setInterval draw 10))
+  (let [world (create-world)]
+    (js/setInterval #(draw world) 10)))
 
   (init)
