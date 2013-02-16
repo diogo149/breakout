@@ -4,8 +4,8 @@
 (def ctx
   (.getContext (by-id "canvas") "2d"))
 
-(defn circle [x y r]
-  (doto ctx
+(defn draw-circle [x y r canvas]
+  (doto canvas
     (.beginPath)
     (.arc x y r 0 (* Math/PI 2) true)
     (.closePath)
@@ -18,8 +18,8 @@
     (.closePath)
     (.fill)))
 
-(defn clear [container]
-  (.clearRect ctx 0 0 (:width container) (:height container)))
+(defn clear [container canvas]
+  (.clearRect canvas 0 0 (:width container) (:height container)))
 
 (defn create-world []
   {:ball (atom {:x 150
@@ -27,7 +27,8 @@
                 :dx 2
                 :dy 4})
    :container {:width 300
-               :height 300}})
+               :height 300}
+   :canvas ctx})
 
 (defn atom-set [atom & values]
   (do (swap! atom #(apply assoc % values))
@@ -53,10 +54,11 @@
 
 (defn draw [world]
   (let [ball (:ball world)
-        container (:container world)]
+        container (:container world)
+        canvas (:canvas world)]
 
-    (clear container)
-    (circle (:x @ball) (:y @ball) 10)
+    (clear container canvas)
+    (draw-circle (:x @ball) (:y @ball) 10 canvas)
     (contain-ball ball container)
     (move-ball ball)))
 
