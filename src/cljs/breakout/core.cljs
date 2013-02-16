@@ -18,45 +18,50 @@
     (.closePath)
     (.fill)))
 
-(def width 300)
-(def height 300)
-
-(defn clear []
-  (.clearRect ctx 0 0 width height))
+(defn clear [container]
+  (.clearRect ctx 0 0 (:width container) (:height container)))
 
 (defn create-world []
-  (atom {:x 150
-   :y 150
-   :dx 2
-   :dy 4}))
+  {:ball (atom {:x 150
+                :y 150
+                :dx 2
+                :dy 4})
+   :container {:width 300
+               :height 300}})
 
 (defn atom-set [atom & values]
   (do (swap! atom #(apply assoc % values))
       atom))
 
-(defn update-world [world]
-  (atom-set world :x (+ (:x @world) (:dx @world)))
-  (atom-set world :y (+ (:y @world) (:dy @world))))
+(defn move-ball [ball]
+  (atom-set ball :x (+ (:x @ball) (:dx @ball)))
+  (atom-set ball :y (+ (:y @ball) (:dy @ball))))
+
+(defn contain-ball [ball container]
+  (let [x (:x @ball)
+        y (:y @ball)
+        dx (:dx @ball)
+        dy (:dy @ball)
+        max-x (:width container)
+        max-y (:height container)]
+    (if (or (> (+ x dx) max-x)
+            (< (+ x dx) 0))
+      (atom-set ball :dx (- dx)))
+    (if (or (> (+ y dy) max-y)
+            (< (+ y dy) 0))
+      (atom-set ball :dy (- dy)))))
 
 (defn draw [world]
-  (let [x (:x @world)
-        y (:y @world)
-        dx (:dx @world)
-        dy (:dy @world)]
-    (clear)
-    (circle x y 10)
+  (let [ball (:ball world)
+        container (:container world)]
 
-    (if (or (> (+ x dx) width)
-          (< (+ x dx) 0))
-      (atom-set world :dx (- dx)))
-    (if (or (> (+ y dy) height)
-            (< (+ y dy) 0))
-      (atom-set world :dy (- dy)))
-
-    (update-world world)))
+    (clear container)
+    (circle (:x @ball) (:y @ball) 10)
+    (contain-ball ball container)
+    (move-ball ball)))
 
 (defn init []
   (let [world (create-world)]
     (js/setInterval #(draw world) 10)))
 
-  (init)
+(init)
