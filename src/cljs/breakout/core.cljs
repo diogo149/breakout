@@ -19,7 +19,11 @@
     (.fill)))
 
 (defn clear [container canvas]
-  (.clearRect canvas 0 0 (:width container) (:height container)))
+  (.clearRect canvas 0 0 (:w container) (:h container)))
+
+(def container
+  {:w 300
+   :h 300})
 
 (defn create-world []
   {:ball (atom {:x 150
@@ -27,8 +31,12 @@
                 :dx 2
                 :dy 4
                 :radius 10})
-   :container {:width 300
-               :height 300}
+   :paddle (atom {:x (/ (:w container) 2)
+            :y (- (:h container) 10)
+            :h 10
+            :w 75})
+   :container {:w 300
+               :h 300}
    :canvas ctx})
 
 (defn atom-set [atom & values]
@@ -45,32 +53,52 @@
   (atom-set ball :x (+ (:x @ball) (:dx @ball)))
   (atom-set ball :y (+ (:y @ball) (:dy @ball))))
 
-(defn contain-ball [ball container]
+(defn reverse-ball [ball direction]
+  (atom-set ball direction (- (direction @ball))))
+
+(defn check-for-paddle [ball paddle]
+  (if (and (> (:x @ball) (:x @paddle))
+           (< (:x @ball) (+ (:x @paddle) (:w @paddle))))
+    (reverse-ball ball :dy)
+    :else (js/clearInterval(interval-id))))
+
+(defn contain-ball [ball container paddle]
   (let [x (:x @ball)
         y (:y @ball)
         dx (:dx @ball)
         dy (:dy @ball)
-        max-x (:width container)
-        max-y (:height container)]
-    (if (or (> (+ x dx) max-x)
-            (< (+ x dx) 0))
-      (atom-set ball :dx (- dx)))
-    (if (or (> (+ y dy) max-y)
-            (< (+ y dy) 0))
-      (atom-set ball :dy (- dy)))))
+        max-x (:w container)
+        max-y (:h container)]
+    (cond
+      (> (+ x dx) max-x) (reverse-ball ball :dx)
+      (< (+ x dx) 0)     (reverse-ball ball :dx)
+      (> (+ y dy) max-y) (check-for-paddle ball paddle)
+      (< (+ y dy) 0)     (reverse-ball ball :dy))))
+
+(defn draw-paddle [paddle canvas]
+  (let [x (:x @paddle)
+        y (:y @paddle)
+        w (:w @paddle)
+        h (:h @paddle)]
+    (rect x y w h)))
+
 
 (defn draw [world]
   (let [ball (:ball world)
         container (:container world)
-        canvas (:canvas world)]
+        canvas (:canvas world)
+        paddle (:paddle world)]
 
     (clear container canvas)
     (draw-ball ball canvas)
-    (contain-ball ball container)
+    (draw-paddle paddle canvas)
+    (contain-ball ball container paddle)
     (move-ball ball)))
+
+(def interval-id (atom ()))
 
 (defn init []
   (let [world (create-world)]
-    (js/setInterval #(draw world) 10)))
+    (swap! interval-id (constantly (js/setInterval #(draw world) 10)))))
 
 (init)
