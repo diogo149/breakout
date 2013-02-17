@@ -1,5 +1,6 @@
 (ns breakout.core
-  (:require [domina :refer [by-id log]]))
+  (:require [domina :refer [by-id log]]
+            [domina.events :refer [listen!]]))
 
 (def ctx
   (.getContext (by-id "canvas") "2d"))
@@ -82,6 +83,27 @@
         h (:h @paddle)]
     (rect x y w h)))
 
+(defmulti key-down (fn [keycode paddle] keycode))
+(defmethod key-down 37 [_ paddle]
+  "Left key"
+  (atom-set paddle :moving-left true))
+(defmethod key-down 39 [_ paddle]
+  "Right key"
+  (atom-set paddle :moving-right true))
+
+(defmulti key-up (fn [keycode paddle] keycode))
+(defmethod key-up 37 [_ paddle]
+  "Left key"
+  (atom-set paddle :moving-left false))
+(defmethod key-up 39 [_ paddle]
+  "Right key"
+  (atom-set paddle :moving-right false))
+
+(defn move-paddle [paddle]
+  (if (:moving-left @paddle)
+    (atom-set paddle :x (- (:x @paddle) 5)))
+  (if (:moving-right @paddle)
+    (atom-set paddle :x (+ (:x @paddle) 5))))
 
 (defn draw [world]
   (let [ball (:ball world)
@@ -91,6 +113,7 @@
 
     (clear container canvas)
     (draw-ball ball canvas)
+    (move-paddle paddle)
     (draw-paddle paddle canvas)
     (contain-ball ball container paddle)
     (move-ball ball)))
@@ -99,6 +122,8 @@
 
 (defn init []
   (let [world (create-world)]
-    (swap! interval-id (constantly (js/setInterval #(draw world) 10)))))
+    (swap! interval-id (constantly (js/setInterval #(draw world) 10)))
+    (listen! js/document :keydown #(key-down (:keyCode %) (:paddle world)))
+    (listen! js/document :keyup #(key-up (:keyCode %) (:paddle world)))))
 
 (init)
