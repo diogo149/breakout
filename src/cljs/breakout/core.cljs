@@ -12,8 +12,8 @@
     (.closePath)
     (.fill)))
 
-(defn rect [x y w h]
-  (doto ctx
+(defn rect [x y w h canvas]
+  (doto canvas
     (.beginPath)
     (.rect x y w h)
     (.closePath)
@@ -81,7 +81,7 @@
         y (:y @paddle)
         w (:w @paddle)
         h (:h @paddle)]
-    (rect x y w h)))
+    (rect x y w h canvas)))
 
 (defmulti key-down (fn [keycode paddle] keycode))
 (defmethod key-down 37 [_ paddle]
