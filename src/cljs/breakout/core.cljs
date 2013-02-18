@@ -90,6 +90,7 @@
 (defmethod key-down 39 [_ paddle]
   "Right key"
   (atom-set paddle :moving-right true))
+(defmethod key-down :default [_ _])
 
 (defmulti key-up (fn [keycode paddle] keycode))
 (defmethod key-up 37 [_ paddle]
@@ -98,6 +99,7 @@
 (defmethod key-up 39 [_ paddle]
   "Right key"
   (atom-set paddle :moving-right false))
+(defmethod key-up :default [_ _])
 
 (defn move-paddle [paddle]
   (if (:moving-left @paddle)
