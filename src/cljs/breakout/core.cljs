@@ -5,22 +5,22 @@
 (def ctx
   (.getContext (by-id "canvas") "2d"))
 
-(defn circle [x y r canvas]
-  (doto canvas
+(defn circle [x y r ctx]
+  (doto ctx
     (.beginPath)
     (.arc x y r 0 (* Math/PI 2) true)
     (.closePath)
     (.fill)))
 
-(defn rect [x y w h canvas]
-  (doto canvas
+(defn rect [x y w h ctx]
+  (doto ctx
     (.beginPath)
     (.rect x y w h)
     (.closePath)
     (.fill)))
 
-(defn clear [container canvas]
-  (.clearRect canvas 0 0 (:w container) (:h container)))
+(defn clear [container ctx]
+  (.clearRect ctx 0 0 (:w container) (:h container)))
 
 (def container
   {:w 300
@@ -36,19 +36,18 @@
             :y (- (:h container) 10)
             :h 10
             :w 75})
-   :container {:w 300
-               :h 300}
-   :canvas ctx})
+   :container container
+   :ctx ctx})
 
 (defn atom-set [atom & values]
   (do (swap! atom #(apply assoc % values))
       atom))
 
-(defn draw-ball [ball canvas]
+(defn draw-ball [ball ctx]
   (let [x (:x @ball)
         y (:y @ball)
         radius (:radius @ball)]
-    (circle x y radius canvas)))
+    (circle x y radius ctx)))
 
 (defn move-ball [ball]
   (atom-set ball :x (+ (:x @ball) (:dx @ball)))
@@ -76,12 +75,12 @@
       (> (+ y dy) max-y) (check-for-paddle ball paddle)
       (< (+ y dy) 0)     (reverse-ball ball :dy))))
 
-(defn draw-paddle [paddle canvas]
+(defn draw-paddle [paddle ctx]
   (let [x (:x @paddle)
         y (:y @paddle)
         w (:w @paddle)
         h (:h @paddle)]
-    (rect x y w h canvas)))
+    (rect x y w h ctx)))
 
 (defmulti key-down (fn [keycode paddle] keycode))
 (defmethod key-down 37 [_ paddle]
@@ -101,6 +100,15 @@
   (atom-set paddle :moving-right false))
 (defmethod key-up :default [_ _])
 
+(defn mouse-move [event world]
+  (let [min-x (.-offsetLeft (.-canvas (:ctx world)))
+        max-x (+ min-x (:w (:container world)))
+        current-x (:clientX event)
+        paddle (:paddle world)]
+    (if (and (> current-x min-x)
+             (< current-x max-x))
+      (atom-set paddle :x (- current-x min-x)))))
+
 (defn move-paddle [paddle]
   (if (:moving-left @paddle)
     (atom-set paddle :x (- (:x @paddle) 5)))
@@ -110,13 +118,13 @@
 (defn draw [world]
   (let [ball (:ball world)
         container (:container world)
-        canvas (:canvas world)
+        ctx (:ctx world)
         paddle (:paddle world)]
 
-    (clear container canvas)
-    (draw-ball ball canvas)
+    (clear container ctx)
+    (draw-ball ball ctx)
     (move-paddle paddle)
-    (draw-paddle paddle canvas)
+    (draw-paddle paddle ctx)
     (contain-ball ball container paddle)
     (move-ball ball)))
 
@@ -126,6 +134,7 @@
   (let [world (create-world)]
     (swap! interval-id (constantly (js/setInterval #(draw world) 10)))
     (listen! js/document :keydown #(key-down (:keyCode %) (:paddle world)))
-    (listen! js/document :keyup #(key-up (:keyCode %) (:paddle world)))))
+    (listen! js/document :keyup #(key-up (:keyCode %) (:paddle world)))
+    (listen! js/document :mousemove #(mouse-move % world))))
 
 (init)
