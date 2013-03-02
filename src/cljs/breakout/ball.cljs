@@ -1,12 +1,5 @@
 (ns breakout.ball
-  (:require [breakout.utils :refer [atom-set]]))
-
-(defn circle [x y r ctx]
-  (doto ctx
-    (.beginPath)
-    (.arc x y r 0 (* Math/PI 2) true)
-    (.closePath)
-    (.fill)))
+  (:require [breakout.utils :refer [atom-set circle]]))
 
 (defn draw-ball [ball ctx]
   (let [x (:x @ball)

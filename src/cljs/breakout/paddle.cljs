@@ -1,12 +1,5 @@
 (ns breakout.paddle
-  (:require [breakout.utils :refer [atom-set]]))
-
-(defn rect [x y w h ctx]
-  (doto ctx
-    (.beginPath)
-    (.rect x y w h)
-    (.closePath)
-    (.fill)))
+  (:require [breakout.utils :refer [atom-set rect]]))
 
 (defn draw-paddle [paddle ctx]
   (let [x (:x @paddle)
