@@ -26,9 +26,10 @@
   (let [min-x (.-offsetLeft (.-canvas (:ctx world)))
         max-x (+ min-x (:w (:container world)))
         current-x (:clientX event)
-        paddle (:paddle world)]
+        paddle (:paddle world)
+        container (:container world)]
     (if (and (> current-x min-x)
-             (< current-x max-x))
+             (< (+ (:w @paddle) current-x) max-x))
       (atom-set paddle :x (- current-x min-x)))))
 
 ;; listeners
