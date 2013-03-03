@@ -1,20 +1,22 @@
 (ns breakout.bricks
   (:require [breakout.utils :refer [rect]]))
 
-(def brick-columns 5)
-(def brick-rows 5)
-(def brick-height 15)
-(def brick-width (/ 300 brick-columns))
-(def brick-padding 1)
+(def columns 5)
+(def rows 5)
+(def height 15)
+(def width (/ 300 columns))
+(def padding 1)
+
+(def colors ["#FF1C0A" "#FFFD0A" "#00A308" "#0008DB" "#EB0093"])
 
 (def bricks
-  (for [x (range brick-rows)]
+  (for [x (range rows)]
     (vec
-      (for [y (range brick-columns)]
-        (atom {:x (+ (* x (+ brick-width brick-padding)) brick-padding)
-               :y (+ (* y (+ brick-height brick-padding)) brick-padding)
-               :w brick-width
-               :h brick-height
+      (for [y (range columns)]
+        (atom {:x (+ (* x (+ width padding)) padding)
+               :y (+ (* y (+ height padding)) padding)
+               :w width
+               :h height
                :alive true})))))
 
 (defn draw-bricks [bricks ctx]
@@ -26,5 +28,5 @@
                 h (:h @brick)
                 alive (:alive @brick)]]
     (if alive
-      (rect x y w h ctx))))
+      (rect x y w h (rand-nth colors) ctx))))
 

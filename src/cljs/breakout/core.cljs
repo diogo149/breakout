@@ -6,11 +6,15 @@
             [breakout.ball :refer [draw-ball move-ball reverse-ball]]
             [breakout.bricks :refer [bricks draw-bricks]]))
 
-(def ctx
-  (.getContext (by-id "canvas") "2d"))
+(def ctx (.getContext (by-id "canvas") "2d"))
+
+(def background-color "#000000")
 
 (defn clear [container ctx]
-  (.clearRect ctx 0 0 (:w container) (:h container)))
+  (let [w (:w container)
+        h (:h container)]
+    (.clearRect ctx 0 0 w h)
+    (rect 0 0 w h background-color ctx)))
 
 (def container
   {:w 300
