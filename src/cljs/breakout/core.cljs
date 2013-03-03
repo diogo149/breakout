@@ -1,9 +1,10 @@
 (ns breakout.core
   (:require [domina :refer [by-id log]]
             [breakout.events :refer [listen-for-keyboard listen-for-mouse]]
-            [breakout.utils :refer [atom-set]]
+            [breakout.utils :refer [atom-set rect]]
             [breakout.paddle :refer [draw-paddle move-paddle]]
-            [breakout.ball :refer [draw-ball move-ball reverse-ball]]))
+            [breakout.ball :refer [draw-ball move-ball reverse-ball]]
+            [breakout.bricks :refer [bricks draw-bricks]]))
 
 (def ctx
   (.getContext (by-id "canvas") "2d"))
@@ -15,16 +16,27 @@
   {:w 300
    :h 300})
 
+(def paddle (atom {:x (/ (:w container) 2)
+                   :y (- (:h container) 10)
+                   :h 10
+                   :w 75}))
+
+(def ball (atom {:x 150
+                 :y 150
+                 :dx 2
+                 :dy 4
+                 :radius 10}))
+
+(defn g [grid-len]
+  (for [x (range 1 grid-len)]
+    (vec
+      (for [y (range grid-len)]
+        [x y {:rover-name 0}]))))
+
 (defn create-world []
-  {:ball (atom {:x 150
-                :y 150
-                :dx 2
-                :dy 4
-                :radius 10})
-   :paddle (atom {:x (/ (:w container) 2)
-            :y (- (:h container) 10)
-            :h 10
-            :w 75})
+  {:ball ball
+   :paddle paddle
+   :bricks bricks
    :container container
    :ctx ctx})
 
@@ -47,17 +59,20 @@
       (> (+ y dy) max-y) (check-for-paddle ball paddle)
       (< (+ y dy) 0)     (reverse-ball ball :dy))))
 
+
 (defn draw [world]
   (let [ball (:ball world)
         container (:container world)
         ctx (:ctx world)
-        paddle (:paddle world)]
+        paddle (:paddle world)
+        bricks (:bricks world)]
 
     (clear container ctx)
     (draw-ball ball ctx)
     (move-paddle paddle)
     (draw-paddle paddle ctx)
     (contain-ball ball container paddle)
+    (draw-bricks bricks ctx)
     (move-ball ball)))
 
 (def interval-id (atom ()))
