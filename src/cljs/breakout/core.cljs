@@ -59,6 +59,23 @@
       (> (+ y dy) max-y) (check-for-paddle ball paddle)
       (< (+ y dy) 0)     (reverse-ball ball :dy))))
 
+(defn check-for-bricks [ball bricks]
+  (doseq [row bricks
+          brick (filter #(:alive @%) row)
+          :let [ball-x (:x @ball)
+                ball-y (:y @ball)
+                brick-x (:x @brick)
+                brick-y (:y @brick)
+                max-x (+ (:w @brick) brick-x)
+                max-y (+ (:h @brick) brick-y)]]
+    (if (and (> ball-x brick-x)
+             (> ball-y brick-y)
+             (< ball-x max-x)
+             (< ball-y max-y))
+      (do
+        (atom-set brick :alive false)
+        (reverse-ball ball :dy)))))
+
 
 (defn draw [world]
   (let [ball (:ball world)
@@ -71,8 +88,9 @@
     (draw-ball ball ctx)
     (move-paddle paddle)
     (draw-paddle paddle ctx)
-    (contain-ball ball container paddle)
     (draw-bricks bricks ctx)
+    (contain-ball ball container paddle)
+    (check-for-bricks ball bricks)
     (move-ball ball)))
 
 (def interval-id (atom ()))

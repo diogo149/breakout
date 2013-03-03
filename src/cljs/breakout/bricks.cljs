@@ -23,6 +23,8 @@
           :let [x (:x @brick)
                 y (:y @brick)
                 w (:w @brick)
-                h (:h @brick)]]
-    (rect x y w h ctx)))
+                h (:h @brick)
+                alive (:alive @brick)]]
+    (if alive
+      (rect x y w h ctx))))
 
