@@ -20,5 +20,10 @@
    [{:source-paths ["src/cljs"]
      :id "dev"
      :compiler
-     {:output-to "resources/public/js/dev.js"
-      :optimizations :simple}}]})
+     {:output-to "resources/public/js/dev.js"}}
+    {:source-paths ["src/cljs"]
+     :id "prod"
+     :compiler
+     {:output-to "resources/public/js/prod.js"
+      :optimizations :advanced
+      :pretty-print false}}]})

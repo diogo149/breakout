@@ -1,10 +1,10 @@
 (ns breakout.bricks
   (:require [breakout.utils :refer [rect]]))
 
-(def columns 5)
-(def rows 5)
-(def height 15)
-(def width (/ 300 columns))
+(def columns 8)
+(def rows 10)
+(def height 30)
+(def width (/ 600 columns))
 (def padding 1)
 
 (def colors ["#FF1C0A" "#FFFD0A" "#00A308" "#0008DB" "#EB0093"])

@@ -17,16 +17,16 @@
     (rect 0 0 w h background-color ctx)))
 
 (def container
-  {:w 300
-   :h 300})
+  {:w 600
+   :h 600})
 
 (def paddle (atom {:x (/ (:w container) 2)
                    :y (- (:h container) 10)
                    :h 10
-                   :w 75}))
+                   :w 125}))
 
-(def ball (atom {:x 150
-                 :y 150
+(def ball (atom {:x (/ (:w container) 2)
+                 :y (/ (:h container) 2)
                  :dx 2
                  :dy 4
                  :radius 10}))
