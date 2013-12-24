@@ -7,12 +7,15 @@
 
   :source-paths ["src/clj"]
 
-  :dependencies [[org.clojure/clojure "1.4.0"]
-                 [compojure "1.1.5"]
-                 [domina "1.0.1"]]
+  :dependencies [[org.clojure/clojure "1.5.1"]
+                 [compojure "1.1.6"]
+                 [domina "1.0.2"]
+                 [cljs-ajax "0.2.3"]
+                 [org.clojure/clojurescript "0.0-2127"]
+                 [org.clojure/data.json "0.2.3"]]
 
-  :plugins [[lein-cljsbuild "0.3.0"]
-            [lein-ring "0.8.2"]]
+  :plugins [[lein-cljsbuild "1.0.1"]
+            [lein-ring "0.8.8"]]
 
   :ring {:handler breakout.core/handler}
   :cljsbuild

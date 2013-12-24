@@ -20,3 +20,29 @@
     (.closePath)
     (.fill)))
 
+(defn scale [ratio f & args]
+  (let [ctx (last args)]
+    (doto ctx
+      (.save)
+      (.scale 0.75 1))
+    (apply f args)
+    (doto ctx
+      (.restore))
+    ;; (.restore ctx)
+    ))
+
+(defn ellipse [x y rx ry rotation color ctx]
+  (set! (.-fillStyle ctx) color)
+  (doto ctx
+    (.beginPath)
+    (.ellipse x y rx ry 0 0 (* Math/PI 2) true)
+    (.closePath)
+    (.fill)))
+
+(defn new-image [src]
+  (let [i (js/Image.)]
+    (aset i "src" src)
+    i))
+
+(defn image [ctx img x y]
+  (.drawImage ctx img x y))

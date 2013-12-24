@@ -4,7 +4,8 @@
             [breakout.utils :refer [atom-set rect]]
             [breakout.paddle :refer [draw-paddle move-paddle]]
             [breakout.ball :refer [draw-ball move-ball reverse-ball]]
-            [breakout.bricks :refer [bricks draw-bricks]]))
+            [breakout.bricks :refer [bricks draw-bricks]]
+            [ajax.core :refer [GET POST]]))
 
 (def ctx (.getContext (by-id "canvas") "2d"))
 
@@ -107,3 +108,17 @@
     (listen-for-mouse world)))
 
 (init)
+
+;; ajax sample
+
+(defn handler [response]
+  (.log js/console (str response)))
+
+(defn error-handler [{:keys [status status-text]}]
+  (.log js/console (str "something bad happened: " status " " status-text)))
+
+(def handlers {:handler handler
+              :error-handler error-handler})
+
+(.log js/console "test")
+(GET "/test" handlers)

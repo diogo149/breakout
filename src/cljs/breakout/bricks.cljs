@@ -28,5 +28,4 @@
                 h (:h @brick)
                 alive (:alive @brick)]]
     (if alive
-      (rect x y w h (rand-nth colors) ctx))))
-
+      (rect x y w h (rand-nth (take 1 colors)) ctx))))
